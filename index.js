@@ -21,8 +21,16 @@ const MAX_STRING_LENGTH = MAX_PROMPT * 4;
 const settings = {
     enabled: false,
     name: 'Goose',
+	randomReply: false,
 };
-
+function shouldGenerateReply() {
+    if (settings.randomReply) {
+		console.log(settings.randomReply);
+        return Math.random() < 0.2;
+    }
+	console.log(settings.randomReply);
+    return true; // Always generate a reply if randomReply is not enabled
+}
 /**
  * Returns a random waiting verb
  * @returns {string} Random waiting verb
@@ -83,6 +91,11 @@ function setHypeBotText(text) {
 function onChatEvent(clear) {
     if (clear) {
         setHypeBotText('');
+    }
+
+    if (!shouldGenerateReply()) {
+        console.log('Skipping HypeBot reply due to random chance.');
+        return; // Exit the function early if we decide not to generate a reply
     }
 
     abortController?.abort();
@@ -209,11 +222,34 @@ jQuery(() => {
         Object.assign(extension_settings.hypebot, settings);
         saveSettingsDebounced();
     });
-
-    eventSource.on(event_types.CHAT_CHANGED, () => onChatEvent(true));
+    $('#hypebot_random_reply').prop('checked', settings.randomReply).on('input', () => {
+        settings.randomReply = $('#hypebot_random_reply').prop('checked');
+        Object.assign(extension_settings.hypebot, settings);
+        saveSettingsDebounced();
+    });
+    /*eventSource.on(event_types.CHAT_CHANGED, () => onChatEvent(true));
     eventSource.on(event_types.MESSAGE_DELETED, () => onChatEvent(true));
     eventSource.on(event_types.MESSAGE_EDITED, () => onChatEvent(true));
     eventSource.on(event_types.MESSAGE_SENT, () => onChatEvent(false));
-    eventSource.on(event_types.MESSAGE_RECEIVED, () => onChatEvent(false));
-    eventSource.on(event_types.MESSAGE_SWIPED, () => onChatEvent(false));
+	*/
+    eventSource.on(event_types.MESSAGE_RECEIVED, () => {
+    console.log("Message received event triggered");
+    if (shouldGenerateReply()) {
+        console.log("Generating reply due to message received");
+        onChatEvent(false);
+    } else {
+        console.log("Skipping reply generation due to random chance");
+    }
+});
+
+	eventSource.on(event_types.MESSAGE_SWIPED, () => {
+    console.log("Message swipe event triggered");
+    if (shouldGenerateReply()) {
+        console.log("Generating reply due to message received");
+        onChatEvent(false);
+    } else {
+        console.log("Skipping reply generation due to random chance");
+    }
+});
+
 });
