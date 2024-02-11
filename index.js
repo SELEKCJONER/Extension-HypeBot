@@ -5,7 +5,7 @@ import { collapseNewlines } from '../../../power-user.js';
 import { bufferToBase64, debounce } from '../../../utils.js';
 import { decodeTextTokens, getTextTokens, tokenizers } from '../../../tokenizers.js';
 
-const MODULE_NAME = 'third-party/Extension-HypeBot-better';
+const MODULE_NAME = 'third-party/Extension-HypeBot';
 const WAITING_VERBS = ['thinking', 'typing', 'brainstorming', 'cooking', 'conjuring', 'reflecting', 'meditating', 'contemplating'];
 const EMPTY_VERBS = [
     'is counting the sheep',
