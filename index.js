@@ -21,15 +21,10 @@ const MAX_STRING_LENGTH = MAX_PROMPT * 4;
 const settings = {
     enabled: false,
     name: 'Goose',
-	randomReply: false,
+	replyChance: 20,
 };
 function shouldGenerateReply() {
-    if (settings.randomReply) {
-		console.log(settings.randomReply);
-        return Math.random() < 0.2;
-    }
-	console.log(settings.randomReply);
-    return true; // Always generate a reply if randomReply is not enabled
+    return Math.random() < settings.replyChance / 100;
 }
 /**
  * Returns a random waiting verb
@@ -94,7 +89,7 @@ function onChatEvent(clear) {
     }
 
     if (!shouldGenerateReply()) {
-        console.log('Skipping HypeBot reply due to random chance.');
+        console.log('Skipping HypeBot reply due to reply chance.');
         return; // Exit the function early if we decide not to generate a reply
     }
 
@@ -222,16 +217,31 @@ jQuery(() => {
         Object.assign(extension_settings.hypebot, settings);
         saveSettingsDebounced();
     });
-    $('#hypebot_random_reply').prop('checked', settings.randomReply).on('input', () => {
-        settings.randomReply = $('#hypebot_random_reply').prop('checked');
+    $('#hypebot_chance_slider').val(settings.replyChance);
+    $('#hypebot_chance_value').val(settings.replyChance);
+    // Sync slider with input field and update settings
+    $('#hypebot_chance_slider').on('input', function() {
+        var value = $(this).val();
+        $('#hypebot_chance_value').val(value);
+        settings.replyChance = parseInt(value, 10);
         Object.assign(extension_settings.hypebot, settings);
         saveSettingsDebounced();
     });
-    /*eventSource.on(event_types.CHAT_CHANGED, () => onChatEvent(true));
-    eventSource.on(event_types.MESSAGE_DELETED, () => onChatEvent(true));
-    eventSource.on(event_types.MESSAGE_EDITED, () => onChatEvent(true));
-    eventSource.on(event_types.MESSAGE_SENT, () => onChatEvent(false));
-	*/
+
+    $('#hypebot_chance_value').on('input', function() {
+        var value = $(this).val();
+        $('#hypebot_chance_slider').val(value);
+        settings.replyChance = parseInt(value, 10);
+        Object.assign(extension_settings.hypebot, settings);
+        saveSettingsDebounced();
+    });
+
+    eventSource.on(event_types.CHAT_CHANGED, () => onChatEvent(true));
+	//this is a bit too many comment chance events 
+    //eventSource.on(event_types.MESSAGE_DELETED, () => onChatEvent(true));
+    //eventSource.on(event_types.MESSAGE_EDITED, () => onChatEvent(true));
+    //eventSource.on(event_types.MESSAGE_SENT, () => onChatEvent(false));
+	
     eventSource.on(event_types.MESSAGE_RECEIVED, () => {
     console.log("Message received event triggered");
     if (shouldGenerateReply()) {
