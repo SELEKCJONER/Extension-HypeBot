@@ -111,7 +111,7 @@ async function generateHypeBot() {
     }
 
     console.debug('Generating HypeBot reply');
-    setHypeBotText(`<span class="hypebot_name">${settings.name}</span> is ${getWaitingVerb()}...`);
+    setHypeBotText(`<span class="hypebot_name">${settings.name}&nbsp;</span> is ${getWaitingVerb()}...`);
 
     const context = getContext();
     const chat = context.chat.slice();
